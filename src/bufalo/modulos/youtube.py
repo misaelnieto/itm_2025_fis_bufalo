@@ -27,7 +27,7 @@ def youtube() -> None:
     help="Tipo de descarga: audio o video",
 )
 @click.option(
-    "-o", "--output", default="downloads", help="Directorio de salida (default: downloads)"
+    "-o", "--output", default=str(Path.home() / "Downloads"), help="Directorio de salida (default: ~/Downloads)"
 )
 @click.option(
     "--format",

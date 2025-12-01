@@ -43,6 +43,10 @@ def autodiscover() -> None:
             click.echo(f"Error cargando módulo {name}: {e}", err=True)
 
 
+from bufalo.modulos.youtube import youtube
+
+main.add_command(youtube)
+
 autodiscover()
 
 if __name__ == "__main__":
