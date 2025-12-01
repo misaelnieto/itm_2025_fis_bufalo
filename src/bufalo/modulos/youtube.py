@@ -1,7 +1,11 @@
 import click
 from pathlib import Path
 import sys
+import os
+import shutil
 import imageio_ffmpeg
+import re
+from urllib.parse import urlparse
 
 try:
     from yt_dlp import YoutubeDL
@@ -77,16 +81,47 @@ def download(
 ) -> None:
     """Descarga videos o audio de YouTube desde una URL."""
     
+    # Validar URL
+    parsed_url = urlparse(url)
+    if not all([parsed_url.scheme, parsed_url.netloc]):
+        click.echo(f"Error: La entrada '{url}' no parece ser un enlace válido. Asegúrate de incluir http:// o https://", err=True)
+        sys.exit(1)
+
+    valid_domains = {"youtube.com", "www.youtube.com", "youtu.be", "m.youtube.com"}
+    if parsed_url.netloc.lower() not in valid_domains:
+        click.echo(f"Error: El dominio '{parsed_url.netloc}' no es válido. Solo se permiten enlaces de YouTube.", err=True)
+        sys.exit(1)
+
+    # Validar formato de rate limit si existe
+    if rate and not re.match(r'^\d+(\.\d+)?[kKmMgG]$', rate):
+        click.echo(f"Error: El límite de velocidad '{rate}' no es válido. Usa formatos como '500K' o '5M'.", err=True)
+        sys.exit(1)
+
+    # Validar archivo de cookies
+    if cookies and not Path(cookies).exists():
+        click.echo(f"Error: El archivo de cookies '{cookies}' no existe.", err=True)
+        sys.exit(1)
+
     out_dir = Path(output)
-    out_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        if not os.access(out_dir, os.W_OK):
+            raise PermissionError("Permiso denegado de escritura")
+    except Exception as e:
+        click.echo(f"Error: No se puede acceder al directorio de salida '{output}': {e}", err=True)
+        sys.exit(1)
 
     # Get ffmpeg executable from imageio-ffmpeg if not provided
     if not ffmpeg_location:
         try:
             ffmpeg_location = imageio_ffmpeg.get_ffmpeg_exe()
         except Exception:
-            # Fallback or let yt-dlp try to find it
             pass
+    
+    # Validar existencia de ffmpeg
+    if not ffmpeg_location and not shutil.which("ffmpeg"):
+        click.echo("Error: No se encontró ffmpeg. Es necesario para procesar los videos.", err=True)
+        sys.exit(1)
 
     ydl_opts = {
         "outtmpl": str(out_dir / "%(title)s [%(id)s].%(ext)s"),
