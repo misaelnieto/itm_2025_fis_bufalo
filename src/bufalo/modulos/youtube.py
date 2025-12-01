@@ -31,8 +31,8 @@ def youtube() -> None:
 )
 @click.option(
     "--format",
-    default="bestvideo*+bestaudio/best",
-    help='Selección de formato (default: "bestvideo*+bestaudio/best")',
+    default="bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+    help='Selección de formato (default: "bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best")',
 )
 @click.option("--rate", help="Límite de velocidad de descarga (ej. 5M, 500K)")
 @click.option(
