@@ -89,7 +89,7 @@ def download(
             pass
 
     ydl_opts = {
-        "outtmpl": str(out_dir / "%(uploader)s/%(title)s [%(id)s].%(ext)s"),
+        "outtmpl": str(out_dir / "%(title)s [%(id)s].%(ext)s"),
         "noprogress": False,
         "continuedl": True,
         "ignoreerrors": "only_download",
