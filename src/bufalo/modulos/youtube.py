@@ -31,7 +31,10 @@ def youtube() -> None:
     help="Tipo de descarga: audio o video",
 )
 @click.option(
-    "-o", "--output", default=str(Path.home() / "Downloads"), help="Directorio de salida (default: ~/Downloads)"
+    "-o",
+    "--output",
+    default=str(Path.home() / "Downloads"),
+    help="Directorio de salida (default: ~/Downloads)",
 )
 @click.option(
     "--format",
@@ -43,9 +46,7 @@ def youtube() -> None:
     "--cookies",
     help="Ruta a archivo cookies.txt (formato Netscape) para videos privados",
 )
-@click.option(
-    "--proxy", help="URL del proxy HTTP/HTTPS si es necesario"
-)
+@click.option("--proxy", help="URL del proxy HTTP/HTTPS si es necesario")
 @click.option(
     "--skip-existing",
     is_flag=True,
@@ -80,21 +81,30 @@ def download(
     ffmpeg_location: str | None,
 ) -> None:
     """Descarga videos o audio de YouTube desde una URL."""
-    
+
     # Validar URL
     parsed_url = urlparse(url)
     if not all([parsed_url.scheme, parsed_url.netloc]):
-        click.echo(f"Error: La entrada '{url}' no parece ser un enlace válido. Asegúrate de incluir http:// o https://", err=True)
+        click.echo(
+            f"Error: La entrada '{url}' no parece ser un enlace válido. Asegúrate de incluir http:// o https://",
+            err=True,
+        )
         sys.exit(1)
 
     valid_domains = {"youtube.com", "www.youtube.com", "youtu.be", "m.youtube.com"}
     if parsed_url.netloc.lower() not in valid_domains:
-        click.echo(f"Error: El dominio '{parsed_url.netloc}' no es válido. Solo se permiten enlaces de YouTube.", err=True)
+        click.echo(
+            f"Error: El dominio '{parsed_url.netloc}' no es válido. Solo se permiten enlaces de YouTube.",
+            err=True,
+        )
         sys.exit(1)
 
     # Validar formato de rate limit si existe
-    if rate and not re.match(r'^\d+(\.\d+)?[kKmMgG]$', rate):
-        click.echo(f"Error: El límite de velocidad '{rate}' no es válido. Usa formatos como '500K' o '5M'.", err=True)
+    if rate and not re.match(r"^\d+(\.\d+)?[kKmMgG]$", rate):
+        click.echo(
+            f"Error: El límite de velocidad '{rate}' no es válido. Usa formatos como '500K' o '5M'.",
+            err=True,
+        )
         sys.exit(1)
 
     # Validar archivo de cookies
@@ -108,7 +118,10 @@ def download(
         if not os.access(out_dir, os.W_OK):
             raise PermissionError("Permiso denegado de escritura")
     except Exception as e:
-        click.echo(f"Error: No se puede acceder al directorio de salida '{output}': {e}", err=True)
+        click.echo(
+            f"Error: No se puede acceder al directorio de salida '{output}': {e}",
+            err=True,
+        )
         sys.exit(1)
 
     # Get ffmpeg executable from imageio-ffmpeg if not provided
@@ -117,10 +130,13 @@ def download(
             ffmpeg_location = imageio_ffmpeg.get_ffmpeg_exe()
         except Exception:
             pass
-    
+
     # Validar existencia de ffmpeg
     if not ffmpeg_location and not shutil.which("ffmpeg"):
-        click.echo("Error: No se encontró ffmpeg. Es necesario para procesar los videos.", err=True)
+        click.echo(
+            "Error: No se encontró ffmpeg. Es necesario para procesar los videos.",
+            err=True,
+        )
         sys.exit(1)
 
     ydl_opts = {
@@ -135,27 +151,31 @@ def download(
     }
 
     if download_type == "audio":
-        ydl_opts.update({
-            "format": "bestaudio/best",
-            "postprocessors": [
-                {
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "192",
-                }
-            ],
-        })
+        ydl_opts.update(
+            {
+                "format": "bestaudio/best",
+                "postprocessors": [
+                    {
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "mp3",
+                        "preferredquality": "192",
+                    }
+                ],
+            }
+        )
     else:
-        ydl_opts.update({
-            "format": format,
-            "merge_output_format": "mp4",
-            "postprocessors": [
-                {
-                    "key": "FFmpegVideoConvertor",
-                    "preferedformat": "mp4",
-                }
-            ],
-        })
+        ydl_opts.update(
+            {
+                "format": format,
+                "merge_output_format": "mp4",
+                "postprocessors": [
+                    {
+                        "key": "FFmpegVideoConvertor",
+                        "preferedformat": "mp4",
+                    }
+                ],
+            }
+        )
 
     if ffmpeg_location:
         ydl_opts["ffmpeg_location"] = ffmpeg_location
@@ -175,13 +195,13 @@ def download(
         click.echo(f"Iniciando descarga de: {url}")
         with YoutubeDL(ydl_opts) as ydl:
             retcode = ydl.download([url])
-        
+
         if retcode != 0:
             click.echo(f"Completado con errores (código {retcode}).", err=True)
             sys.exit(retcode)
         else:
             click.echo("Descarga completada exitosamente.")
-            
+
     except Exception as e:
         click.echo(f"La descarga falló: {e}", err=True)
         sys.exit(2)
