@@ -22,7 +22,9 @@ Tu tarea es implementar un **módulo con comandos CLI** siguiendo este proceso:
 Sigue estas guías en orden para completar tu tarea:
 
 ### 1. [Instalación de UV](docs/UV.md) 🔧
+
 Instala y configura UV, el administrador de paquetes que usaremos en el proyecto.
+
 
 ### 2. [TDD y pytest](docs/pytest.md) 🧪
 Aprende qué es TDD, cómo funciona pytest, y cómo escribir pruebas para tu módulo.
