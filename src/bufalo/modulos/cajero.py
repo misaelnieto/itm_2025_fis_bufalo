@@ -61,9 +61,9 @@ def tipo_cambio(pin_input: str) -> None:
         return
     
     click.echo("Tipo de cambio actual:")
-    click.echo(f"  USD -> MXN: $18.50")
-    click.echo(f"  EUR -> MXN: $20.10") 
-    click.echo(f"  GBP -> MXN: $23.75")
+    click.echo("  USD -> MXN: $18.50")
+    click.echo("  EUR -> MXN: $20.10") 
+    click.echo("  GBP -> MXN: $23.75")
     click.echo("Ultima actualizacion: Hoy")
 
 if __name__ == "__main__":
