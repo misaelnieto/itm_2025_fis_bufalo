@@ -1,11 +1,12 @@
-import click
-from pathlib import Path
-import sys
 import os
-import shutil
-import imageio_ffmpeg
 import re
+import shutil
+import sys
+from pathlib import Path
 from urllib.parse import urlparse
+
+import click
+import imageio_ffmpeg
 
 try:
     from yt_dlp import YoutubeDL
@@ -39,7 +40,10 @@ def youtube() -> None:
 @click.option(
     "--format",
     default="bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-    help='Selección de formato (default: "bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best")',
+    help=(
+        'Selección de formato (default: '
+        '"bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best")'
+    ),
 )
 @click.option("--rate", help="Límite de velocidad de descarga (ej. 5M, 500K)")
 @click.option(
@@ -86,7 +90,8 @@ def download(
     parsed_url = urlparse(url)
     if not all([parsed_url.scheme, parsed_url.netloc]):
         click.echo(
-            f"Error: La entrada '{url}' no parece ser un enlace válido. Asegúrate de incluir http:// o https://",
+            f"Error: La entrada '{url}' no parece ser un enlace válido. "
+            "Asegúrate de incluir http:// o https://",
             err=True,
         )
         sys.exit(1)
@@ -94,7 +99,8 @@ def download(
     valid_domains = {"youtube.com", "www.youtube.com", "youtu.be", "m.youtube.com"}
     if parsed_url.netloc.lower() not in valid_domains:
         click.echo(
-            f"Error: El dominio '{parsed_url.netloc}' no es válido. Solo se permiten enlaces de YouTube.",
+            f"Error: El dominio '{parsed_url.netloc}' no es válido. "
+            "Solo se permiten enlaces de YouTube.",
             err=True,
         )
         sys.exit(1)
@@ -102,7 +108,8 @@ def download(
     # Validar formato de rate limit si existe
     if rate and not re.match(r"^\d+(\.\d+)?[kKmMgG]$", rate):
         click.echo(
-            f"Error: El límite de velocidad '{rate}' no es válido. Usa formatos como '500K' o '5M'.",
+            f"Error: El límite de velocidad '{rate}' no es válido. "
+            "Usa formatos como '500K' o '5M'.",
             err=True,
         )
         sys.exit(1)
