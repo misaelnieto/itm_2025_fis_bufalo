@@ -14,7 +14,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["pytest>=8.0.0", "pytest-cov>=4.1.0", "ruff>=0.3.0"]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+    "ty>=0.0.1a32",
+]
 
 [tool.ruff]
 line-length = 88
