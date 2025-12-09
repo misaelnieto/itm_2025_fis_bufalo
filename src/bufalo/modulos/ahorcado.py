@@ -2,7 +2,7 @@ import random
 
 import click
 
-#Dibujar el ahorcado con ascii
+# Dibujar el ahorcado con ascii
 AHORCADO_ASCII = [
     r"""
      +---+
