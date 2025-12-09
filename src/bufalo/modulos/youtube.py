@@ -119,7 +119,7 @@ def download(
         click.echo(f"Error: El archivo de cookies '{cookies}' no existe.", err=True)
         sys.exit(1)
 
-    out_dir = Path(output)
+    out_dir = Path(output).expanduser()
     try:
         out_dir.mkdir(parents=True, exist_ok=True)
         if not os.access(out_dir, os.W_OK):
