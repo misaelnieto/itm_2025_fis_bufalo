@@ -33,7 +33,7 @@ jobs:
         uv run ruff format --check .
 
     - name: Type check with Ty
-      run: uv run ty .
+      run: uv run ty check .
 
     - name: Test with pytest
       run: uv run pytest
