@@ -5,24 +5,19 @@ import click
 OPCIONES = ["piedra", "papel", "tijeras"]
 
 
-@click.group()
+@click.group(help="Juego de Piedra, Papel o Tijeras")
 def ppt():
-    """Juego de Piedra, Papel o Tijeras"""
+    pass
 
 
-@ppt.command()
-@click.argument("jugador")
+@ppt.command(help="Juega contra la CPU (la CPU elige random).")
+@click.argument("jugador", type=click.Choice(OPCIONES))
 def jugar(jugador):
-    jugador = jugador.lower()
-
-    if jugador not in OPCIONES:
-        click.echo("❌ Opción inválida. Usa: piedra, papel o tijeras.")
-        return
-
+    """Juega contra la CPU (esta se elige al azar)."""
     cpu = random.choice(OPCIONES)
 
-    click.echo(f"Tú: {jugador}")
-    click.echo(f"CPU: {cpu}")
+    click.echo(f"👤 Tú: {jugador}")
+    click.echo(f"🤖 CPU: {cpu}")
 
     if jugador == cpu:
         click.echo("🤝 Empate")
