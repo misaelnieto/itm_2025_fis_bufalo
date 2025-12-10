@@ -5,33 +5,48 @@ from typing import Dict, Final
 import click
 
 UNIDADES: Final[Dict[str, float]] = {
-    "km": 1000.0,
     "m": 1.0,
     "cm": 0.01,
+    "km": 1000.0,
 }
 
 
-@click.group()
+@click.group(
+    help=(
+        "Herramientas para convertir unidades de longitud.\n\n"
+        "Ejemplos:\n"
+        "  bufalo conversor convertir 20 m cm   -> 2000.0\n"
+        "  bufalo conversor convertir 5 km m    -> 5000.0\n"
+    )
+)
 def conversor() -> None:
-    """Comandos de conversión de unidades básicas."""
-    return
+    """Grupo de comandos para conversión de unidades."""
+    pass
 
 
-@conversor.command()
+@conversor.command(
+    help=(
+        "Convierte un VALOR de una unidad a otra.\n\n"
+        "Uso:\n"
+        "  bufalo conversor convertir VALOR DE A\n\n"
+        "Parámetros:\n"
+        "  VALOR  Número a convertir (ej. 20)\n"
+        "  DE     Unidad origen  (m, cm, km)\n"
+        "  A      Unidad destino (m, cm, km)\n\n"
+        "Ejemplo:\n"
+        "  bufalo conversor convertir 20 km m   -> 20000.0\n"
+    )
+)
 @click.argument("valor", type=float)
-@click.argument("de", type=str)
-@click.argument("a", type=str)
+@click.argument("de", metavar="DE")
+@click.argument("a", metavar="A")
 def convertir(valor: float, de: str, a: str) -> None:
-    """Convierte VALOR desde la unidad DE hacia la unidad A."""
-    unidad_origen = de.lower()
-    unidad_destino = a.lower()
+    """Convierte VALOR de la unidad DE a la unidad A."""
+    if de not in UNIDADES or a not in UNIDADES:
+        # Click antepone "Error: " al mensaje
+        raise click.ClickException("Unidad no válida. Unidades soportadas: km, m, cm")
 
-    if unidad_origen not in UNIDADES or unidad_destino not in UNIDADES:
-        unidades_disponibles = ", ".join(UNIDADES.keys())
-        mensaje = f"Error: Unidad no válida. Usa únicamente: {unidades_disponibles}"
-        raise click.ClickException(mensaje)
-
-    en_metros = valor * UNIDADES[unidad_origen]
-    resultado = en_metros / UNIDADES[unidad_destino]
+    valor_en_metros = valor * UNIDADES[de]
+    resultado = valor_en_metros / UNIDADES[a]
 
     click.echo(f"Resultado: {resultado}")
