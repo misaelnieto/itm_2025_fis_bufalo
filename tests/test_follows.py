@@ -1,7 +1,10 @@
 ﻿import json
 import tempfile
+
 from click.testing import CliRunner
+
 from bufalo.modulos.follows import francisco
+
 
 def test_myfollows_option_real_data() -> None:
     """Prueba completa de --myfollows con datos simulados."""
@@ -27,7 +30,8 @@ def test_myfollows_option_real_data() -> None:
          tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
-        f1.seek(0); f2.seek(0)
+        f1.seek(0)
+        f2.seek(0)
 
         result = runner.invoke(francisco, ["comparar", "--myfollows", f1.name, f2.name])
 
@@ -61,14 +65,20 @@ def test_myfollowers_option_real_data() -> None:
          tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
-        f1.seek(0); f2.seek(0)
+        f1.seek(0)
+        f2.seek(0)
 
-        result = runner.invoke(francisco, ["comparar", "--myfollowers", f1.name, f2.name])
+        result = runner.invoke(
+            francisco,
+            ["comparar", "--myfollowers", f1.name, f2.name]
+        )
 
     assert result.exit_code == 0
     assert "maria" in result.output
     assert "lucia" in result.output
     assert "Seguidores que NO sigues de vuelta" in result.output
+
+
 def test_comparar_without_options() -> None:
     """Prueba cuando no se pasa ninguna opción (--myfollows ni --myfollowers)."""
     runner = CliRunner()
@@ -91,11 +101,15 @@ def test_comparar_without_options() -> None:
          tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
-        f1.seek(0); f2.seek(0)
+        f1.seek(0)
+        f2.seek(0)
 
-        result = runner.invoke(francisco, ["comparar", f1.name, f2.name])
+        # 🚨 Ahora sí: sin opciones
+        result = runner.invoke(
+            francisco,
+            ["comparar", f1.name, f2.name]
+        )
 
-    # En este caso no debería mostrar ninguno de los encabezados
+    # En este caso debe mostrar el mensaje de validación
     assert result.exit_code == 0
-    assert "Personas que sigues pero NO te siguen" not in result.output
-    assert "Seguidores que NO sigues de vuelta" not in result.output
+    assert "Debes especificar --myfollows o --myfollowers" in result.output
