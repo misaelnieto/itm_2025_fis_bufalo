@@ -3,7 +3,7 @@ import click
 
 @click.group()
 def mayusminus() -> None:
-    """Convierte texto a mayúsculas o minúsculas."""
+    """Conversor de mayúsculas, minúsculas y ASCII."""
     pass
 
 
@@ -23,3 +23,28 @@ def minuscula(texto: str) -> None:
     click.echo(result)
 
 
+@mayusminus.command(name="toascii")
+@click.argument("texto", type=str)
+@click.option("--sep", default=" ", help="Separador entre códigos ASCII")
+def toascii(texto: str, sep: str) -> None:
+    """Convierte cada carácter del texto a su código ASCII separado por 'sep'"""
+    codes = [str(ord(c)) for c in texto]
+    click.echo(sep.join(codes))
+
+
+@mayusminus.command(name="fromascii")
+@click.argument("texto", type=str)
+@click.option("--sep", default=" ", help="Separador usado entre códigos ASCII")
+def fromascii(texto: str, sep: str) -> None:
+    """Convierte códigos ASCII separados por sep a texto."""
+    parts = [p for p in texto.split(sep) if p != ""]
+    try:
+        chars = [chr(int(s)) for s in parts]
+    except ValueError:
+        click.echo(
+            "Entrada inválida: "
+            "asegúrate de proporcionar números ASCII separados correctamente.",
+            err=True,
+        )
+        raise click.Abort() from None
+    click.echo("".join(chars))
