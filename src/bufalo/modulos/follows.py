@@ -1,4 +1,4 @@
-﻿import json
+import json
 
 import click
 
@@ -12,9 +12,7 @@ def francisco():
 @francisco.command()
 @click.option("--myfollows", is_flag=True, help="Muestra a los que sigo y no me siguen")
 @click.option(
-    "--myfollowers",
-    is_flag=True,
-    help="Muestra a los que me siguen pero no los sigo"
+    "--myfollowers", is_flag=True, help="Muestra a los que me siguen pero no los sigo"
 )
 @click.argument("followers_path")
 @click.argument("following_path")
@@ -27,8 +25,7 @@ def comparar(myfollows, myfollowers, followers_path, following_path):
 
     if isinstance(followers_data, dict):
         followers = [
-            item["value"]
-            for item in followers_data.get("string_list_data", [])
+            item["value"] for item in followers_data.get("string_list_data", [])
         ]
     elif isinstance(followers_data, list):
         followers = [item["string_list_data"][0]["value"] for item in followers_data]
@@ -36,8 +33,7 @@ def comparar(myfollows, myfollowers, followers_path, following_path):
         followers = []
 
     following = [
-        entry["title"]
-        for entry in following_data.get("relationships_following", [])
+        entry["title"] for entry in following_data.get("relationships_following", [])
     ]
 
     no_sigo_de_vuelta = [f for f in followers if f not in following]

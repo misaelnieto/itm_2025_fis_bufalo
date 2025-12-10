@@ -1,4 +1,4 @@
-﻿import json
+import json
 import tempfile
 
 from click.testing import CliRunner
@@ -11,23 +11,21 @@ def test_myfollows_option_real_data() -> None:
     runner = CliRunner()
 
     followers_data = {
-        "string_list_data": [
-            {"value": "juan"},
-            {"value": "maria"},
-            {"value": "pedro"}
-        ]
+        "string_list_data": [{"value": "juan"}, {"value": "maria"}, {"value": "pedro"}]
     }
 
     following_data = {
         "relationships_following": [
             {"title": "juan"},
             {"title": "ana"},
-            {"title": "pedro"}
+            {"title": "pedro"},
         ]
     }
 
-    with tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1, \
-         tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
+    with (
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1,
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2,
+    ):
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
         f1.seek(0)
@@ -49,7 +47,7 @@ def test_myfollowers_option_real_data() -> None:
             {"value": "juan"},
             {"value": "maria"},
             {"value": "pedro"},
-            {"value": "lucia"}
+            {"value": "lucia"},
         ]
     }
 
@@ -57,20 +55,21 @@ def test_myfollowers_option_real_data() -> None:
         "relationships_following": [
             {"title": "juan"},
             {"title": "pedro"},
-            {"title": "ana"}
+            {"title": "ana"},
         ]
     }
 
-    with tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1, \
-         tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
+    with (
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1,
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2,
+    ):
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
         f1.seek(0)
         f2.seek(0)
 
         result = runner.invoke(
-            francisco,
-            ["comparar", "--myfollowers", f1.name, f2.name]
+            francisco, ["comparar", "--myfollowers", f1.name, f2.name]
         )
 
     assert result.exit_code == 0
@@ -83,32 +82,23 @@ def test_comparar_without_options() -> None:
     """Prueba cuando no se pasa ninguna opción (--myfollows ni --myfollowers)."""
     runner = CliRunner()
 
-    followers_data = {
-        "string_list_data": [
-            {"value": "juan"},
-            {"value": "maria"}
-        ]
-    }
+    followers_data = {"string_list_data": [{"value": "juan"}, {"value": "maria"}]}
 
     following_data = {
-        "relationships_following": [
-            {"title": "juan"},
-            {"title": "pedro"}
-        ]
+        "relationships_following": [{"title": "juan"}, {"title": "pedro"}]
     }
 
-    with tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1, \
-         tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
+    with (
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1,
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2,
+    ):
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
         f1.seek(0)
         f2.seek(0)
 
         # 🚨 Ahora sí: sin opciones
-        result = runner.invoke(
-            francisco,
-            ["comparar", f1.name, f2.name]
-        )
+        result = runner.invoke(francisco, ["comparar", f1.name, f2.name])
 
     # En este caso debe mostrar el mensaje de validación
     assert result.exit_code == 0
