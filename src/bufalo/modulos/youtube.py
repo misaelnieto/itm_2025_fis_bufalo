@@ -119,8 +119,7 @@ def download(
         ydl_opts.update(
             {
                 "format": (
-                    "bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/"
-                    "best[ext=mp4]/best"
+                    "bestvideo[vcodec^=avc1]+bestaudio[ext=m4a]/best[ext=mp4]/best"
                 ),
                 "merge_output_format": "mp4",
                 "postprocessors": [

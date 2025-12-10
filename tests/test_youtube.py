@@ -81,10 +81,10 @@ def test_output_dir_write_permission_error(mock_mkdir, mock_access):
     mock_mkdir.return_value = None
     # os.access returns False (no write permission)
     mock_access.return_value = False
-    
+
     runner = CliRunner()
     result = runner.invoke(
-        youtube, 
+        youtube,
         [
             "download",
             "https://youtube.com/watch?v=123",
@@ -104,7 +104,7 @@ def test_missing_ffmpeg(mock_shutil_which, mock_get_exe):
     # Simulate imageio failure AND no system ffmpeg
     mock_get_exe.side_effect = Exception("Not found")
     mock_shutil_which.return_value = None
-    
+
     runner = CliRunner()
     result = runner.invoke(
         youtube, ["download", "https://youtube.com/watch?v=123", "--type", "video"]
@@ -122,7 +122,7 @@ def test_imageio_fails_but_system_ffmpeg_exists(
     # Simulate imageio failure BUT system ffmpeg exists
     mock_get_exe.side_effect = Exception("No binary")
     mock_shutil_which.return_value = "/usr/bin/ffmpeg"
-    
+
     mock_instance = MagicMock()
     mock_instance.download.return_value = 0
     mock_ydl.return_value.__enter__.return_value = mock_instance
@@ -139,7 +139,7 @@ def test_imageio_fails_but_system_ffmpeg_exists(
 @patch("bufalo.modulos.youtube.imageio_ffmpeg")
 def test_download_nonzero_retcode(mock_ffmpeg, mock_ydl):
     mock_ffmpeg.get_ffmpeg_exe.return_value = "/bin/ffmpeg"
-    
+
     mock_instance = MagicMock()
     mock_instance.download.return_value = 1  # Non-zero return code
     mock_ydl.return_value.__enter__.return_value = mock_instance
