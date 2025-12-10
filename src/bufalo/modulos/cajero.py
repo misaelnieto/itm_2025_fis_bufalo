@@ -1,6 +1,7 @@
-import click
 import json
 import os
+
+import click
 
 ESTADO_ARCHIVO = "cajero_estado.json"
 
@@ -11,7 +12,7 @@ def cargar_estado():
             with open(ESTADO_ARCHIVO, "r") as f:
                 estado = json.load(f)
                 return estado.get("saldo", 1000.0), estado.get("movimientos", [])
-        except:
+        except (json.JSONDecodeError, IOError):
             return 1000.0, []
     return 1000.0, []
 
