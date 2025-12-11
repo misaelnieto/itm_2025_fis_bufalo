@@ -1,0 +1,14 @@
+{
+  "saldo": 1000.0,
+  "movimientos": [
+    "Retiro: -$1000.0",
+    "Depósito: +$500.0",
+    "Depósito: +$1000.0",
+    "Retiro: -$1500.0",
+    "Depósito: +$1500.0",
+    "Retiro: -$1500.00",
+    "Depósito: +$525.00",
+    "Depósito: +$1500.00",
+    "Retiro: -$1500.00"
+  ]
+}

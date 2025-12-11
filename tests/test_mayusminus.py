@@ -43,3 +43,13 @@ def test_convertir_fromascii() -> None:
     assert result.exit_code == 0
     # Suponiendo que entra "65 66 67", debe salir "ABC"
     assert "ABC" in result.output
+
+
+def test_fromascii_error() -> None:
+    """Prueba que fromascii falla con entrada inválida (no numérica)."""
+    runner = CliRunner()
+    # Proporcionamos un token no numérico para forzar ValueError
+    result = runner.invoke(mayusminus, ["fromascii", "65 x 67"])
+    # Debe fallar (exit code distinto de 0) y mostrar mensaje de error
+    assert result.exit_code != 0
+    assert "Entrada inválida" in result.output
