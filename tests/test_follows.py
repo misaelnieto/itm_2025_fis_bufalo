@@ -102,6 +102,7 @@ def test_comparar_without_options() -> None:
 
 # 🔥 Tests adicionales para cobertura total
 
+
 def test_lista_como_followers_data() -> None:
     """Cubre el caso donde followers_data es una lista en vez de dict."""
     runner = CliRunner()
@@ -110,12 +111,12 @@ def test_lista_como_followers_data() -> None:
         {"string_list_data": [{"value": "ana"}]},
         {"string_list_data": [{"value": "juan"}]},
     ]
-    following_data = {
-        "relationships_following": [{"title": "ana"}, {"title": "juan"}]
-    }
+    following_data = {"relationships_following": [{"title": "ana"}, {"title": "juan"}]}
 
-    with tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1, \
-         tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
+    with (
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1,
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2,
+    ):
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
         f1.seek(0)
@@ -124,7 +125,7 @@ def test_lista_como_followers_data() -> None:
         result = runner.invoke(
             francisco,
             ["comparar", "--myfollowers", f1.name, f2.name],
-            )
+        )
 
     assert result.exit_code == 0
     assert "✅ Sigues a todos tus seguidores" in result.output
@@ -137,8 +138,10 @@ def test_todos_me_siguen() -> None:
     followers_data = {"string_list_data": [{"value": "ana"}, {"value": "juan"}]}
     following_data = {"relationships_following": [{"title": "ana"}, {"title": "juan"}]}
 
-    with tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1, \
-         tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
+    with (
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1,
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2,
+    ):
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
         f1.seek(0)
@@ -157,8 +160,10 @@ def test_todos_los_sigo() -> None:
     followers_data = {"string_list_data": [{"value": "ana"}, {"value": "juan"}]}
     following_data = {"relationships_following": [{"title": "ana"}, {"title": "juan"}]}
 
-    with tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1, \
-         tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2:
+    with (
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f1,
+        tempfile.NamedTemporaryFile("w+", encoding="utf-8", delete=False) as f2,
+    ):
         json.dump(followers_data, f1)
         json.dump(following_data, f2)
         f1.seek(0)
@@ -166,8 +171,8 @@ def test_todos_los_sigo() -> None:
 
         result = runner.invoke(
             francisco,
-         ["comparar", "--myfollowers", f1.name, f2.name],
-         )
+            ["comparar", "--myfollowers", f1.name, f2.name],
+        )
 
     assert result.exit_code == 0
     assert "✅ Sigues a todos tus seguidores" in result.output
