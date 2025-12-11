@@ -8,7 +8,8 @@ Para ejecutar estas pruebas:
     uv run pytest tests/test_cajero.py -v
 
 Para ver el coverage:
-    uv run pytest tests/test_cajero.py --cov=src.bufalo.modulos.cajero --cov-report=term-missing
+    uv run pytest tests/test_cajero.py --cov=src.bufalo.modulos.cajero \
+    --cov-report=term-missing
 """
 
 import json
@@ -111,7 +112,8 @@ def test_cargar_estado_archivo_sin_movimientos(temp_estado_file: str) -> None:
     """
     Prueba que cargar_estado maneja archivos sin la clave 'movimientos'.
 
-    Cuando falta la clave 'movimientos', debe usar una lista vacía como valor por defecto.
+    Cuando falta la clave 'movimientos', debe usar una lista vacía como
+    valor por defecto.
     """
     estado = {"saldo": 750.0}
     with open(temp_estado_file, "w") as f:
@@ -146,7 +148,8 @@ def test_guardar_estado_sobrescribe_archivo(temp_estado_file: str) -> None:
     """
     Prueba que guardar_estado sobrescribe el contenido anterior.
 
-    Cuando se llama guardar_estado dos veces, el contenido anterior debe ser reemplazado.
+    Cuando se llama guardar_estado dos veces, el contenido anterior debe
+    ser reemplazado.
     """
     with patch("bufalo.modulos.cajero.ESTADO_ARCHIVO", temp_estado_file):
         guardar_estado(1000.0, ["Primero"])
@@ -180,7 +183,8 @@ def test_consultar_pin_incorrecto(runner: CliRunner) -> None:
     """
     Prueba el comando 'consultar' con PIN incorrecto.
 
-    Cuando se proporciona un PIN incorrecto, el comando debe mostrar un mensaje de error.
+    Cuando se proporciona un PIN incorrecto, el comando debe mostrar un
+    mensaje de error.
     """
     result = runner.invoke(cajero, ["consultar", "--pin-input", "9999"])
     assert result.exit_code == 0
@@ -190,7 +194,9 @@ def test_consultar_pin_incorrecto(runner: CliRunner) -> None:
 # ==================== TESTS PARA COMANDO depositar ====================
 
 
-def test_depositar_pin_correcto_monto_positivo(runner: CliRunner, temp_estado_file: str) -> None:
+def test_depositar_pin_correcto_monto_positivo(
+    runner: CliRunner, temp_estado_file: str
+) -> None:
     """
     Prueba el comando 'depositar' con PIN correcto y monto positivo.
 
@@ -226,7 +232,9 @@ def test_depositar_monto_negativo(runner: CliRunner, temp_estado_file: str) -> N
     El sistema no debe permitir depósitos con montos negativos.
     """
     with patch("bufalo.modulos.cajero.ESTADO_ARCHIVO", temp_estado_file):
-        result = runner.invoke(cajero, ["depositar", "--pin-input", "1234", "--", "-500"])
+        result = runner.invoke(
+            cajero, ["depositar", "--pin-input", "1234", "--", "-500"]
+        )
         assert "Monto debe ser positivo" in result.output
 
 
@@ -241,11 +249,14 @@ def test_depositar_monto_cero(runner: CliRunner, temp_estado_file: str) -> None:
         assert "Monto debe ser positivo" in result.output
 
 
-def test_depositar_guarda_movimiento(runner: CliRunner, temp_estado_file: str) -> None:
+def test_depositar_guarda_movimiento(
+    runner: CliRunner, temp_estado_file: str
+) -> None:
     """
     Prueba que el comando 'depositar' guarda el movimiento en el archivo.
 
-    Después de hacer un depósito, el movimiento debe estar registrado en el archivo JSON.
+    Después de hacer un depósito, el movimiento debe estar registrado en
+    el archivo JSON.
     """
     with patch("bufalo.modulos.cajero.ESTADO_ARCHIVO", temp_estado_file):
         runner.invoke(cajero, ["depositar", "250.50", "--pin-input", "1234"])
@@ -259,7 +270,9 @@ def test_depositar_guarda_movimiento(runner: CliRunner, temp_estado_file: str) -
 # ==================== TESTS PARA COMANDO retirar ====================
 
 
-def test_retirar_pin_correcto_fondos_suficientes(runner: CliRunner, temp_estado_file: str) -> None:
+def test_retirar_pin_correcto_fondos_suficientes(
+    runner: CliRunner, temp_estado_file: str
+) -> None:
     """
     Prueba el comando 'retirar' con PIN correcto y fondos suficientes.
 
@@ -280,7 +293,8 @@ def test_retirar_pin_incorrecto(runner: CliRunner, temp_estado_file: str) -> Non
     """
     Prueba el comando 'retirar' con PIN incorrecto.
 
-    Cuando se proporciona un PIN incorrecto, el comando debe mostrar un mensaje de error.
+    Cuando se proporciona un PIN incorrecto, el comando debe mostrar un
+    mensaje de error.
     """
     with patch("bufalo.modulos.cajero.ESTADO_ARCHIVO", temp_estado_file):
         result = runner.invoke(cajero, ["retirar", "500", "--pin-input", "9999"])
@@ -359,7 +373,8 @@ def test_tipo_cambio_pin_incorrecto(runner: CliRunner) -> None:
     """
     Prueba el comando 'tipo_cambio' con PIN incorrecto.
 
-    Cuando se proporciona un PIN incorrecto, el comando debe mostrar un mensaje de error.
+    Cuando se proporciona un PIN incorrecto, el comando debe mostrar un
+    mensaje de error.
     """
     result = runner.invoke(cajero, ["tipo-cambio", "--pin-input", "9999"])
     assert "PIN incorrecto" in result.output
@@ -369,7 +384,8 @@ def test_main_entry_point(runner: CliRunner) -> None:
     """
     Prueba la ejecución del módulo como punto de entrada principal.
 
-    Verifica que el grupo 'cajero' se ejecuta correctamente cuando se invoca directamente.
+    Verifica que el grupo 'cajero' se ejecuta correctamente cuando se
+    invoca directamente.
     """
     result = runner.invoke(cajero, ["--help"])
     assert result.exit_code == 0

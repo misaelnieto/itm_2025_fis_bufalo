@@ -56,11 +56,11 @@ def depositar(pin_input: str, monto: float) -> None:
     if pin_input != pin:
         click.echo("PIN incorrecto")
         return
-    
+
     if monto <= 0:
         click.echo("Monto debe ser positivo")
         return
-    
+
     saldo += monto
     movimientos.append(f"Depósito: +${monto}")
     guardar_estado(saldo, movimientos)
@@ -76,15 +76,15 @@ def retirar(pin_input: str, monto: float) -> None:
     if pin_input != pin:
         click.echo("PIN incorrecto")
         return
-    
+
     if monto <= 0:
         click.echo("Monto debe ser positivo")
         return
-    
+
     if monto > saldo:
         click.echo("Fondos insuficientes")
         return
-    
+
     saldo -= monto
     movimientos.append(f"Retiro: -${monto}")
     guardar_estado(saldo, movimientos)
