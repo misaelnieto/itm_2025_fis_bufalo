@@ -1,12 +1,6 @@
-"""
-Pruebas unitarias para el módulo romanos.
-- romano_a_entero: convierte un número romano a entero.
-- entero_a_romano: convierte un entero (1–3999) a número romano.
-"""
-
 import pytest
 
-from bufalo.modulos.romanos import entero_a_romano, romano_a_entero
+from bufalo.modulos.romanos import entero_a_romano, main, romano_a_entero
 
 # ==========================
 #   Pruebas romano -> entero
@@ -115,3 +109,33 @@ def test_entero_a_romano_fuera_de_rango() -> None:
 
     with pytest.raises(ValueError):
         entero_a_romano(4000)
+
+
+# ================================
+#   Pruebas del flujo interactivo
+# ================================
+
+
+def test_main_entero_a_romano(monkeypatch, capsys) -> None:
+    # Simulamos que input() devuelve "18"
+    monkeypatch.setattr("builtins.input", lambda _: "18")
+
+    main()
+
+    capturado = capsys.readouterr()
+    assert "Conversor Romano <-> Entero" in capturado.out
+    assert "18 en romano es: XVIII" in capturado.out
+
+
+def test_main_romano_a_entero(monkeypatch, capsys) -> None:
+    """
+    Prueba el flujo interactivo cuando se ingresa un número romano.
+    Simula escribir 'XIV' y verifica que imprima '14'.
+    """
+    monkeypatch.setattr("builtins.input", lambda _: "XIV")
+
+    main()
+
+    capturado = capsys.readouterr()
+    assert "Conversor Romano <-> Entero" in capturado.out
+    assert "XIV en entero es: 14" in capturado.out

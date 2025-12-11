@@ -1,8 +1,6 @@
 def romano_a_entero(romano: str) -> int:
-    """
-    Convierte un número romano válido a un entero.
-    Soporta notación sustractiva: IV, IX, XL, XC, CD, CM.
-    """
+    """Convierte un número romano válido a un entero.
+    Soporta notación sustractiva: IV, IX, XL, XC, CD, CM."""
     valores = {
         "I": 1,
         "V": 5,
@@ -16,7 +14,6 @@ def romano_a_entero(romano: str) -> int:
     total = 0
     previo = 0
 
-    # Trabajamos siempre en mayúsculas
     for letra in reversed(romano.upper()):
         valor = valores[letra]
         if valor < previo:
@@ -31,15 +28,9 @@ def romano_a_entero(romano: str) -> int:
 def entero_a_romano(numero: int) -> str:
     """
     Convierte un entero entre 1 y 3999 a número romano estándar.
-
-    Ejemplos:
-        4    -> IV
-        9    -> IX
-        58   -> LVIII
-        1994 -> MCMXCIV
     """
     if numero < 1 or numero > 3999:
-        raise ValueError("El número debe estar entre 1 y 3999 para convertir a romano.")
+        raise ValueError("El número debe estar entre 1 y 3999.")
 
     valores = [
         (1000, "M"),
@@ -67,23 +58,21 @@ def entero_a_romano(numero: int) -> str:
     return resultado
 
 
-# =====================================
-#     🚀 SCANNER INTERACTIVO
-# =====================================
-if __name__ == "__main__":
+def main() -> None:
+    """
+    Punto de entrada interactivo para el conversor.
+    Pide un número por teclado y muestra la conversión.
+    """
     print("Conversor Romano <-> Entero (1–3999)")
     dato = input("Escribe un número romano o entero: ")
 
     if dato.isdigit():
         numero = int(dato)
-        try:
-            romano = entero_a_romano(numero)
-            print(f"{numero} en romano es: {romano}")
-        except ValueError as e:
-            print("Error:", e)
+        print(f"{numero} en romano es: {entero_a_romano(numero)}")
     else:
-        try:
-            entero = romano_a_entero(dato)
-            print(f"{dato} en entero es: {entero}")
-        except KeyError:
-            print("Error: número romano no válido.")
+        print(f"{dato} en entero es: {romano_a_entero(dato)}")
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()
+
