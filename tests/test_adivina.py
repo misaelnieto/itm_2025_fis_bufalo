@@ -1,5 +1,7 @@
 from unittest.mock import patch
+
 from click.testing import CliRunner
+
 from bufalo.modulos.adivina import adivina, evaluar_intento
 
 # ---------------------------
