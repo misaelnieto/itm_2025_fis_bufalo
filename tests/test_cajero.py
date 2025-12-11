@@ -15,7 +15,6 @@ Para ver el coverage:
 import json
 import os
 import tempfile
-from typing import Generator
 from unittest.mock import patch
 
 import pytest
@@ -29,13 +28,17 @@ from bufalo.modulos.cajero import (
 
 
 @pytest.fixture
-def temp_estado_file() -> Generator[str, None, None]:
+def temp_estado_file(request: pytest.FixtureRequest) -> str:
     """Fixture para crear un archivo temporal para el estado"""
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         temp_path = f.name
-    yield temp_path
-    if os.path.exists(temp_path):
-        os.unlink(temp_path)
+
+    def cleanup() -> None:
+        if os.path.exists(temp_path):
+            os.unlink(temp_path)
+
+    request.addfinalizer(cleanup)
+    return temp_path
 
 
 @pytest.fixture
