@@ -249,9 +249,7 @@ def test_depositar_monto_cero(runner: CliRunner, temp_estado_file: str) -> None:
         assert "Monto debe ser positivo" in result.output
 
 
-def test_depositar_guarda_movimiento(
-    runner: CliRunner, temp_estado_file: str
-) -> None:
+def test_depositar_guarda_movimiento(runner: CliRunner, temp_estado_file: str) -> None:
     """
     Prueba que el comando 'depositar' guarda el movimiento en el archivo.
 
@@ -390,4 +388,3 @@ def test_main_entry_point(runner: CliRunner) -> None:
     result = runner.invoke(cajero, ["--help"])
     assert result.exit_code == 0
     assert "Cajero automático - PIN default: 1234" in result.output
-
