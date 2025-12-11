@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from click.testing import CliRunner
 
 from bufalo.modulos.adivina import adivina, evaluar_intento
@@ -20,33 +22,56 @@ def test_evaluar_intento_muy_alto():
 
 
 # ---------------------------
-# PRUEBAS CLI
+# PRUEBAS CLI (Simulando escenarios)
 # ---------------------------
 
 
-def test_cli_jugar():
+def test_cli_jugar_gana():
+    """Simula que el usuario adivina el número correctamente."""
     runner = CliRunner()
 
-    # Simulamos 3 intentos
-    result = runner.invoke(adivina, ["jugar"], input="10\n50\n70\n")
+    # Forzamos que el número secreto sea 50
+    with patch("bufalo.modulos.adivina.random.randint", return_value=50):
+        result = runner.invoke(adivina, ["jugar"], input="50\n")
 
-    # Verificaciones mínimas necesarias
-    assert "Adivina un número entre 1 y 100" in result.output
-    assert "Intento 1" in result.output
-    assert "Intento 2" in result.output
-    assert "Intento 3" in result.output
     assert result.exit_code == 0
+    assert "ganaste" in result.output
 
 
-def test_cli_dificil():
+def test_cli_jugar_pierde():
+    """Simula que el usuario pierde para cubrir la línea 'Perdiste'."""
     runner = CliRunner()
 
-    # Simulamos 3 intentos
-    result = runner.invoke(adivina, ["dificil"], input="100\n500\n900\n")
+    # Forzamos que el número secreto sea 99
+    with patch("bufalo.modulos.adivina.random.randint", return_value=99):
+        # Intentamos 3 veces con números erróneos (1, 2, 3)
+        result = runner.invoke(adivina, ["jugar"], input="1\n2\n3\n")
 
-    # Verificaciones mínimas necesarias
-    assert "Modo difícil" in result.output
-    assert "Intento 1" in result.output
-    assert "Intento 2" in result.output
-    assert "Intento 3" in result.output
     assert result.exit_code == 0
+    assert (
+        "Perdiste. El número era 99" in result.output
+    )  # <--- Esto cubre la línea faltante
+
+
+def test_cli_dificil_gana():
+    """Simula ganar en modo difícil."""
+    runner = CliRunner()
+
+    with patch("bufalo.modulos.adivina.random.randint", return_value=500):
+        result = runner.invoke(adivina, ["dificil"], input="500\n")
+
+    assert result.exit_code == 0
+    assert "ganaste" in result.output
+
+
+def test_cli_dificil_pierde():
+    """Simula perder en modo difícil."""
+    runner = CliRunner()
+
+    with patch("bufalo.modulos.adivina.random.randint", return_value=1000):
+        result = runner.invoke(adivina, ["dificil"], input="1\n2\n3\n")
+
+    assert result.exit_code == 0
+    assert (
+        "Perdiste. El número era 1000" in result.output
+    )  # <--- Esto cubre la otra línea faltante
