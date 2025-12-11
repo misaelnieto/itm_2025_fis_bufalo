@@ -1,6 +1,6 @@
-import click
 import random
 
+import click
 
 
 @click.group()
