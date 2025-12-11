@@ -4,6 +4,11 @@ import os
 import click
 
 ESTADO_ARCHIVO = "cajero_estado.json"
+PIN = "1234"
+SALDO_INICIAL = 1000.0
+
+saldo = SALDO_INICIAL
+movimientos = []
 
 
 def cargar_estado():
@@ -51,9 +56,11 @@ def depositar(pin_input: str, monto: float) -> None:
     if pin_input != pin:
         click.echo("PIN incorrecto")
         return
+    
     if monto <= 0:
         click.echo("Monto debe ser positivo")
         return
+    
     saldo += monto
     movimientos.append(f"Depósito: +${monto}")
     guardar_estado(saldo, movimientos)
@@ -69,12 +76,15 @@ def retirar(pin_input: str, monto: float) -> None:
     if pin_input != pin:
         click.echo("PIN incorrecto")
         return
+    
     if monto <= 0:
         click.echo("Monto debe ser positivo")
         return
+    
     if monto > saldo:
         click.echo("Fondos insuficientes")
         return
+    
     saldo -= monto
     movimientos.append(f"Retiro: -${monto}")
     guardar_estado(saldo, movimientos)
@@ -94,7 +104,3 @@ def tipo_cambio(pin_input: str) -> None:
     click.echo("  EUR -> MXN: $20.10")
     click.echo("  GBP -> MXN: $23.75")
     click.echo("Ultima actualizacion: Hoy")
-
-
-if __name__ == "__main__":
-    cajero()
