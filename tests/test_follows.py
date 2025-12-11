@@ -2,6 +2,7 @@ import json
 import tempfile
 
 from click.testing import CliRunner
+
 from bufalo.modulos.follows import francisco
 
 
@@ -120,7 +121,10 @@ def test_lista_como_followers_data() -> None:
         f1.seek(0)
         f2.seek(0)
 
-        result = runner.invoke(francisco, ["comparar", "--myfollowers", f1.name, f2.name])
+        result = runner.invoke(
+            francisco,
+            ["comparar", "--myfollowers", f1.name, f2.name],
+            )
 
     assert result.exit_code == 0
     assert "✅ Sigues a todos tus seguidores" in result.output
@@ -160,7 +164,10 @@ def test_todos_los_sigo() -> None:
         f1.seek(0)
         f2.seek(0)
 
-        result = runner.invoke(francisco, ["comparar", "--myfollowers", f1.name, f2.name])
+        result = runner.invoke(
+            francisco,
+         ["comparar", "--myfollowers", f1.name, f2.name],
+         )
 
     assert result.exit_code == 0
     assert "✅ Sigues a todos tus seguidores" in result.output
