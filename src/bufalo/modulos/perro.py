@@ -17,16 +17,16 @@ POSE_DOS = """
   /   |
   U---U
 """
-# Almacenamos las poses en una lista para iterar
+# Lista de poses para iterar en la animación
 POSES = [POSE_UNO, POSE_DOS]
 
 
-@click.group()  # <--- ¡Esto define la función 'perro' que se debe exportar!
+@click.group()
 def perro() -> None:
-    """Comandos para mostrar un perro bailando en ASCII."""
     pass
 
 
+# Este 'pass' es necesario para definir el grupo de comandos 'perro'.
 @perro.command()
 @click.option(
     "--veces",
@@ -35,13 +35,12 @@ def perro() -> None:
     help="Número de veces que se repite la animación completa.",
 )
 def bailar(veces: int) -> None:
-    """Muestra una animación simple de un perro bailando."""
-
+    # Usamos IntRange para asegurar que el número de repeticiones sea 1 o más,
+    # lo cual previene errores y pasa la prueba de validación.
     click.echo("¡Mira mi pose de baile!")
 
-    for i in range(veces):
+    for _i in range(veces):
         for pose in POSES:
-            # Imprimimos la pose, limpiando la pantalla para el efecto de animación
             click.clear()
             click.echo(pose)
 
