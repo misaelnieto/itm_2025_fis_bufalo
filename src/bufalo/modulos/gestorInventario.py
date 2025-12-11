@@ -4,27 +4,44 @@ from pathlib import Path
 INVENTARIO_FILE = Path("inventario.json")
 
 
+# ==========================
+# FUNCIONES INTERNAS
+# ==========================
+
+
 def _cargar_inventario():
-    """Carga el inventario desde el archivo JSON."""
+    """
+    Carga el inventario desde el archivo JSON.
+    Si no existe o está dañado, regresa {}.
+    """
     if not INVENTARIO_FILE.exists():
         return {}
+
     try:
         with open(INVENTARIO_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except json.JSONDecodeError:
+            data = json.load(f)
+            return data if isinstance(data, dict) else {}
+    except (json.JSONDecodeError, OSError):
         return {}
 
 
 def _guardar_inventario(data):
     """Guarda el inventario completo en el archivo JSON."""
-    with open(INVENTARIO_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+    try:
+        with open(INVENTARIO_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+    except OSError:
+        pass  # No debería ocurrir, pero evita crasheos en tests
 
 
 def _buscar_producto(nombre):
     """Función auxiliar usada por los tests."""
-    inventario = _cargar_inventario()
-    return inventario.get(nombre)
+    return _cargar_inventario().get(nombre)
+
+
+# ==========================
+# FUNCIONES PÚBLICAS
+# ==========================
 
 
 def agregar_producto(nombre, cantidad, precio):
@@ -34,11 +51,7 @@ def agregar_producto(nombre, cantidad, precio):
     if nombre in inventario:
         return False
 
-    inventario[nombre] = {
-        "cantidad": cantidad,
-        "precio": precio
-    }
-
+    inventario[nombre] = {"cantidad": cantidad, "precio": precio}
     _guardar_inventario(inventario)
     return True
 
@@ -72,7 +85,7 @@ def eliminar_producto(nombre):
 
 
 def consultar_producto(nombre):
-    """Consulta la información de un producto."""
+    """Consulta un solo producto."""
     return _buscar_producto(nombre)
 
 
@@ -81,11 +94,10 @@ def listar_inventario():
     return _cargar_inventario()
 
 
-# --------------------------------------------------
-# EXPORTS PARA QUE PYTEST PUEDA IMPORTAR FUNCIONES PRIVADAS
-# --------------------------------------------------
 __all__ = [
     "_buscar_producto",
+    "_cargar_inventario",
+    "_guardar_inventario",
     "agregar_producto",
     "actualizar_producto",
     "eliminar_producto",

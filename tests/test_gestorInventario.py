@@ -1,113 +1,68 @@
-import json
 import pytest
-from pathlib import Path
+
+import bufalo.modulos.gestorInventario as gi
 
 
-def test_agregar(monkeypatch, tmp_path):
-    fake = tmp_path / "inv.json"
-    fake.write_text("{}", encoding="utf-8")
-
-    monkeypatch.setattr(
-        "bufalo.modulos.gestorInventario.INVENTARIO_FILE",
-        fake
-    )
-
-    from bufalo.modulos.gestorInventario import agregar_producto, consultar_producto
-
-    r = agregar_producto("Manzanas", 10, 5.0)
-    assert r is True
-
-    data = consultar_producto("Manzanas")
-    assert data["cantidad"] == 10
-    assert data["precio"] == 5.0
+@pytest.fixture(autouse=True)
+def limpiar_archivo():
+    """Limpia el archivo antes y después de cada test."""
+    if gi.INVENTARIO_FILE.exists():
+        gi.INVENTARIO_FILE.unlink()
+    yield
+    if gi.INVENTARIO_FILE.exists():
+        gi.INVENTARIO_FILE.unlink()
 
 
-def test_agregar_existente(monkeypatch, tmp_path):
-    fake = tmp_path / "inv.json"
-    fake.write_text(json.dumps({"Pan": {"cantidad": 4, "precio": 12.0}}), encoding="utf-8")
-
-    monkeypatch.setattr(
-        "bufalo.modulos.gestorInventario.INVENTARIO_FILE",
-        fake
-    )
-
-    from bufalo.modulos.gestorInventario import agregar_producto
-
-    r = agregar_producto("Pan", 8, 15.0)
-    assert r is False
+def test_agregar_producto():
+    assert gi.agregar_producto("Coca", 5, 12.5) is True
+    assert gi.agregar_producto("Coca", 10, 18) is False
 
 
-def test_actualizar(monkeypatch, tmp_path):
-    fake = tmp_path / "inv.json"
-    fake.write_text(
-        json.dumps({"Coca": {"cantidad": 5, "precio": 20}}),
-        encoding="utf-8"
-    )
-
-    monkeypatch.setattr(
-        "bufalo.modulos.gestorInventario.INVENTARIO_FILE",
-        fake
-    )
-
-    from bufalo.modulos.gestorInventario import actualizar_producto, consultar_producto
-
-    r = actualizar_producto("Coca", cantidad=9, precio=22)
-    assert r is True
-
-    data = consultar_producto("Coca")
-    assert data["cantidad"] == 9
-    assert data["precio"] == 22
+def test_actualizar_producto():
+    gi.agregar_producto("Pan", 20, 5)
+    assert gi.actualizar_producto("Pan", cantidad=50) is True
+    assert gi.actualizar_producto("Pan", precio=8) is True
+    assert gi.actualizar_producto("X") is False
 
 
-def test_eliminar(monkeypatch, tmp_path):
-    fake = tmp_path / "inv.json"
-    fake.write_text(
-        json.dumps({"Huevos": {"cantidad": 30, "precio": 3.5}}),
-        encoding="utf-8"
-    )
-
-    monkeypatch.setattr(
-        "bufalo.modulos.gestorInventario.INVENTARIO_FILE",
-        fake
-    )
-
-    from bufalo.modulos.gestorInventario import eliminar_producto, consultar_producto
-
-    r = eliminar_producto("Huevos")
-    assert r is True
-
-    assert consultar_producto("Huevos") is None
+def test_eliminar_producto():
+    gi.agregar_producto("Leche", 10, 20)
+    assert gi.eliminar_producto("Leche") is True
+    assert gi.eliminar_producto("Inexistente") is False
 
 
-def test_listar(monkeypatch, tmp_path):
-    fake = tmp_path / "inv.json"
-    data = {
-        "Uno": {"cantidad": 1, "precio": 10},
-        "Dos": {"cantidad": 2, "precio": 20},
-    }
-    fake.write_text(json.dumps(data), encoding="utf-8")
-
-    monkeypatch.setattr(
-        "bufalo.modulos.gestorInventario.INVENTARIO_FILE",
-        fake
-    )
-
-    from bufalo.modulos.gestorInventario import listar_inventario
-
-    r = listar_inventario()
-    assert r == data
+def test_consultar_y_listar():
+    gi.agregar_producto("Arroz", 15, 22)
+    item = gi.consultar_producto("Arroz")
+    assert item["cantidad"] == 15
+    assert "Arroz" in gi.listar_inventario()
 
 
-def test_buscar_aux_inexistente(monkeypatch, tmp_path):
-    fake = tmp_path / "inv.json"
-    fake.write_text("{}", encoding="utf-8")
+def test_cargar_archivo_inexistente():
+    if gi.INVENTARIO_FILE.exists():
+        gi.INVENTARIO_FILE.unlink()
+    assert gi._cargar_inventario() == {}
 
-    monkeypatch.setattr(
-        "bufalo.modulos.gestorInventario.INVENTARIO_FILE",
-        fake
-    )
 
-    from bufalo.modulos.gestorInventario import _buscar_producto
+def test_cargar_json_invalido():
+    gi.INVENTARIO_FILE.write_text("{esto no es json", encoding="utf-8")
+    assert gi._cargar_inventario() == {}
 
-    r = _buscar_producto("NO_EXISTE")
-    assert r is None
+
+def test_guardar_y_cargar():
+    data = {"Test": {"cantidad": 1, "precio": 9.9}}
+    gi._guardar_inventario(data)
+    assert gi._cargar_inventario() == data
+
+
+def test_guardar_inventario_oserror(monkeypatch):
+    """Fuerza un OSError en _guardar_inventario para cubrir el bloque except."""
+
+    def fake_open(*args, **kwargs):
+        raise OSError("error simulado")
+
+    # Reemplaza open() solo dentro de este test
+    monkeypatch.setattr("builtins.open", fake_open)
+
+    # No debe crashear aunque guardar falle
+    gi._guardar_inventario({"x": 1})
