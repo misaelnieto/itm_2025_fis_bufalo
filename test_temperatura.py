@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..')) # Vamos 3 niveles arriba
 
 # Importamos la función que vamos a probar
-from .temperatura import c_a_f, f_a_c
+from bufalo.modulos.temperatura import c_a_f, f_a_c
 # Importamos la función de configuración (Ahora debería funcionar)
 from bufalo.config.preferencias import establecer_preferencia 
 
