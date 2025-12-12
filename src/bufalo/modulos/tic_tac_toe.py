@@ -1,6 +1,10 @@
 import random
+import click # Necesario para la CLI
 
-# Variables auxiliares que pueden ser accedidas por las funciones de reglas
+# =================================================================
+# 1. Variables Globales y de Reglas
+# =================================================================
+
 POSITION_MAP = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 9: 8}
 WIN_CONDITIONS = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], # Filas
@@ -9,7 +13,6 @@ WIN_CONDITIONS = [
 ]
 
 
-# Funciones de reglas (utilizadas por las clases y las pruebas)
 def check_win(board, mark):
     """Comprueba si el jugador ha ganado."""
     for condition in WIN_CONDITIONS:
@@ -26,7 +29,7 @@ def get_valid_moves(board):
     return [i for i, mark in enumerate(board) if mark == " "]
 
 def minimax(board, current_mark, player_mark, computer_mark):
-    """Implementación de IA simple con estrategia de apertura corregida."""
+    """Implementación de IA simple con estrategia de apertura."""
 
     # 1. Comprueba si puede ganar en el siguiente movimiento
     for i in range(9):
@@ -37,7 +40,6 @@ def minimax(board, current_mark, player_mark, computer_mark):
                 return i
 
     # 2. Comprueba si puede bloquear al oponente
-    # Aquí se determina quién es el oponente (el que no es current_mark)
     opponent_mark = player_mark if current_mark != player_mark else computer_mark
     
     for i in range(9):
@@ -47,23 +49,24 @@ def minimax(board, current_mark, player_mark, computer_mark):
             if check_win(board_copy, opponent_mark):
                 return i
 
-    # 3. Elige una posición aleatoria de las disponibles
+    # 3. Estrategia de Apertura (Corrección para TDD)
     available_moves = get_valid_moves(board)
 
-    # CORRECCIÓN PARA LA PRUEBA test_ai_optimal_first_move
     if len(available_moves) == 9:
         # Si es el primer movimiento (tablero vacío), priorizar centro o esquinas
-        optimal_moves = [4, 0, 2, 6, 8] # 4 (Centro) es la mejor opción
+        optimal_moves = [4, 0, 2, 6, 8]
         first_moves = [move for move in optimal_moves if move in available_moves]
         return random.choice(first_moves)
-    # FIN DE CORRECCIÓN
 
+    # 4. Elige una posición aleatoria (si ninguna de las anteriores aplica)
     if available_moves:
         return random.choice(available_moves)
     return -1
 
 
-# CLASES REQUERIDAS POR LAS PRUEBAS
+# =================================================================
+# 2. Clases de Lógica (POO)
+# =================================================================
 
 class Board:
     """Clase que representa el tablero de juego y sus operaciones."""
@@ -104,25 +107,29 @@ class Board:
 
 class Game:
     """Clase que maneja el flujo de juego, turnos y estado."""
-    def __init__(self):
+    
+    
+    def __init__(self, starter=None):
         """Inicializa el estado del juego."""
         self.board = Board()
-        self.current_player = random.choice(["X", "O"])
+        
+        if starter:
+            self.current_player = starter
+        else:
+            self.current_player = random.choice(["X", "O"])
+            
         self.game_over = False
         self.winner = None
         self.moves_made = 0
-        self.player_mark = 'X' # Asumir X es jugador para las pruebas
-        self.computer_mark = 'O' # Asumir O es IA para las pruebas
+        self.player_mark = 'X' 
+        self.computer_mark = 'O' 
 
     def switch_player(self):
         """Cambia el turno entre X y O."""
         self.current_player = 'O' if self.current_player == 'X' else 'X'
 
     def process_move(self, index):
-        """
-        Realiza el movimiento, actualiza el contador, y verifica el estado.
-        Retorna True si el movimiento fue exitoso.
-        """
+        """Realiza el movimiento, actualiza el contador, y verifica el estado."""
         if self.game_over:
             return False
 
@@ -139,3 +146,73 @@ class Game:
 
             return True
         return False
+
+
+# =================================================================
+# 3. Lógica CLI (Para Auto-Descubrimiento)
+# =================================================================
+
+def get_player_input(board):
+    """Pide y valida la entrada del usuario."""
+    while True:
+        try:
+            position = click.prompt("Elige tu movimiento (1-9)", type=int)
+            index = POSITION_MAP.get(position)
+            
+            if index is None or not board.cells[index] == " ":
+                click.echo("¡Movimiento no válido! Elige un número disponible (1-9).")
+            else:
+                return index
+        except click.exceptions.Abort:
+            raise
+        except Exception:
+            click.echo("Entrada no válida. Por favor, introduce un número.")
+
+
+@click.command()
+def tictactoe():
+    """Ejecuta el juego Tic Tac Toe (Tres en Raya) contra la computadora."""
+    click.echo("¡Bienvenido a Tic Tac Toe!")
+    
+    # 1. Asignar símbolos
+    player_mark = click.prompt("¿Quieres ser 'X' o 'O'?", type=click.Choice(['X', 'O']), show_choices=True)
+    computer_mark = "O" if player_mark == "X" else "X"
+    
+    # 2. Inicializar el juego
+    # Usamos el constructor con 'starter' opcional
+    game = Game() 
+    game.player_mark = player_mark
+    game.computer_mark = computer_mark
+    
+    click.echo(f"\n¡Tú eres: {player_mark}! La computadora es: {computer_mark}.")
+    click.echo(f"¡El jugador {game.current_player} empieza primero!")
+
+    # 3. Ciclo principal del juego
+    while not game.game_over:
+        click.echo(game.board.display())
+
+        if game.current_player == player_mark:
+            # Turno del jugador
+            move_index = get_player_input(game.board)
+            if game.process_move(move_index):
+                game.switch_player()
+
+        elif game.current_player == computer_mark:
+            # Turno de la computadora
+            click.echo("Turno de la computadora...")
+            
+            # Obtener el movimiento de la IA
+            move_index = minimax(game.board.cells, computer_mark, player_mark, computer_mark)
+            
+            if move_index != -1 and game.process_move(move_index):
+                game.switch_player()
+            
+    # 4. Resultado final
+    click.echo(game.board.display())
+    if game.winner == "Tie":
+        click.echo("¡Es un empate!")
+    elif game.winner:
+        if game.winner == player_mark:
+            click.echo("¡Felicidades! ¡Has ganado!")
+        else:
+            click.echo("¡La computadora ha ganado!")
