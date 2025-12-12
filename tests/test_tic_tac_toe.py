@@ -1,7 +1,3 @@
-"""
-Pruebas unitarias para el módulo Tic Tac Toe desarrolladas con TDD.
-"""
-
 from src.bufalo.modulos.tic_tac_toe import (
     Board,
     Game,
@@ -170,17 +166,12 @@ class TestIntegration:
 
     def test_complete_game_flow(self):
         """Test 20: Flujo completo de juego (integración)."""
-        # CORRECCIÓN CLAVE: Forzar que 'X' inicie el juego para que la prueba sea determinista.
         game = Game(starter="X") 
-
-        # Jugador X en centro (Primer movimiento. Como X inició, X debe moverse)
         assert game.process_move(4) # Eliminada la comparación == True
         assert game.board.cells[4] == "X"
 
-        # Jugador O en esquina (Debe cambiar el turno antes de moverse)
         game.switch_player()
         assert game.process_move(0) # Eliminada la comparación == True
         assert game.board.cells[0] == "O"
 
-        # Verificar que el juego no ha terminado
         assert not game.game_over # Uso not para comparación == False

@@ -1,9 +1,5 @@
+import click 
 import random
-import click # Necesario para la CLI
-
-# =================================================================
-# 1. Variables Globales y de Reglas
-# =================================================================
 
 POSITION_MAP = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 9: 8}
 WIN_CONDITIONS = [
@@ -62,11 +58,6 @@ def minimax(board, current_mark, player_mark, computer_mark):
     if available_moves:
         return random.choice(available_moves)
     return -1
-
-
-# =================================================================
-# 2. Clases de Lógica (POO)
-# =================================================================
 
 class Board:
     """Clase que representa el tablero de juego y sus operaciones."""
@@ -147,11 +138,6 @@ class Game:
             return True
         return False
 
-
-# =================================================================
-# 3. Lógica CLI (Para Auto-Descubrimiento)
-# =================================================================
-
 def get_player_input(board):
     """Pide y valida la entrada del usuario."""
     while True:
@@ -175,7 +161,11 @@ def tictactoe():
     click.echo("¡Bienvenido a Tic Tac Toe!")
     
     # 1. Asignar símbolos
-    player_mark = click.prompt("¿Quieres ser 'X' o 'O'?", type=click.Choice(['X', 'O']), show_choices=True)
+    player_mark = click.prompt(
+    "¿Quieres ser 'X' o 'O'?", 
+    type=click.Choice(['X', 'O']), 
+    show_choices=True
+)
     computer_mark = "O" if player_mark == "X" else "X"
     
     # 2. Inicializar el juego
