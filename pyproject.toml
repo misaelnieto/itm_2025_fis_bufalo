@@ -31,22 +31,3 @@ ignore = []
 [tool.pytest.ini_options]
 addopts = "--cov=bufalo --cov-report=term-missing"
 testpaths = ["tests"]
-
-[tool.coverage.report]
-# Revisa que esta sección esté correctamente en tu pyproject.toml
-# Si no usas pyproject.toml, usa pytest.ini en su lugar.
-
-# Omitir archivos que no nos importan en el reporte total (cli.py)
-omit = [
-    "src/bufalo/cli.py",
-]
-
-# Excluir líneas que son difíciles de cubrir, como definiciones triviales
-exclude_lines = [
-    # Excluye la definición del método is_finished
-    '''def is_finished''', 
-    # Excluye la entrada principal
-    '''if __name__ == .__main__.:''',
-    # Excluir el patrón de CLI que causaba problemas
-    '''sys.exit''',
-]
