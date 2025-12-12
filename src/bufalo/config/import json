@@ -1,0 +1,54 @@
+import json
+from pathlib import Path
+
+# La ubicación de dónde se guardará el archivo de preferencias (en la raíz del proyecto)
+PREFS_FILE = Path("configuracion.json") 
+
+
+# ==========================
+# FUNCIONES INTERNAS DE GESTIÓN
+# ==========================
+
+
+def _cargar_preferencias():
+    """
+    Carga las preferencias de configuración desde el archivo JSON.
+    Si no existe o está dañado, regresa la configuración por defecto.
+    """
+    # Configuración por defecto
+    DEFAULTS = {
+        "unidad_preferida": "C",  # C para Celsius, F para Fahrenheit
+        "decimales": 2
+    }
+
+    if not PREFS_FILE.exists():
+        return DEFAULTS
+
+    try:
+        # Abre y lee el archivo
+        with open(PREFS_FILE, "r", encoding="utf-8") as f:
+            preferencias = json.load(f)
+            # Combina con los valores por defecto para asegurar que no falta nada
+            return DEFAULTS | preferencias 
+
+    except json.JSONDecodeError:
+        # Maneja archivos inválidos
+        print("ADVERTENCIA: Archivo de configuración corrupto o vacío. Usando preferencias por defecto.")
+        return DEFAULTS
+    
+    except Exception as e:
+        # Maneja errores generales
+        print(f"ERROR: No se pudo leer el archivo de configuración: {e}")
+        return DEFAULTS
+
+
+def _guardar_preferencias(prefs):
+    """
+    Guarda el diccionario de preferencias en el archivo JSON.
+    """
+    try:
+        with open(PREFS_FILE, "w", encoding="utf-8") as f:
+            # indent=4 hace que el JSON sea legible
+            json.dump(prefs, f, indent=4)
+    except Exception as e:
+        print(f"ERROR: No se pudo guardar la configuración: {e}")
