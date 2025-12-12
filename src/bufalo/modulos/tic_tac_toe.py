@@ -1,11 +1,17 @@
-import click 
 import random
+
+import click
 
 POSITION_MAP = {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 9: 8}
 WIN_CONDITIONS = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8], # Filas
-    [0, 3, 6], [1, 4, 7], [2, 5, 8], # Columnas
-    [0, 4, 8], [2, 4, 6],           # Diagonales
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],  # Filas
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],  # Columnas
+    [0, 4, 8],
+    [2, 4, 6],  # Diagonales
 ]
 
 
@@ -16,13 +22,16 @@ def check_win(board, mark):
             return True
     return False
 
+
 def check_tie(board):
     """Comprueba si el tablero está lleno (empate)."""
     return " " not in board
 
+
 def get_valid_moves(board):
     """Retorna una lista de índices (0-8) para los movimientos válidos."""
     return [i for i, mark in enumerate(board) if mark == " "]
+
 
 def minimax(board, current_mark, player_mark, computer_mark):
     """Implementación de IA simple con estrategia de apertura."""
@@ -37,7 +46,7 @@ def minimax(board, current_mark, player_mark, computer_mark):
 
     # 2. Comprueba si puede bloquear al oponente
     opponent_mark = player_mark if current_mark != player_mark else computer_mark
-    
+
     for i in range(9):
         if board[i] == " ":
             board_copy = list(board)
@@ -59,8 +68,10 @@ def minimax(board, current_mark, player_mark, computer_mark):
         return random.choice(available_moves)
     return -1
 
+
 class Board:
     """Clase que representa el tablero de juego y sus operaciones."""
+
     def __init__(self):
         """Inicializa el tablero vacío."""
         self.cells = [" "] * 9
@@ -73,13 +84,13 @@ class Board:
             f"{self.cells[1] if self.cells[1] != ' ' else '2'} | "
             f"{self.cells[2] if self.cells[2] != ' ' else '3'} |\n"
         )
-        output += ("-------------\n")
+        output += "-------------\n"
         output += (
             f"| {self.cells[3] if self.cells[3] != ' ' else '4'} | "
             f"{self.cells[4] if self.cells[4] != ' ' else '5'} | "
             f"{self.cells[5] if self.cells[5] != ' ' else '6'} |\n"
         )
-        output += ("-------------\n")
+        output += "-------------\n"
         output += (
             f"| {self.cells[6] if self.cells[6] != ' ' else '7'} | "
             f"{self.cells[7] if self.cells[7] != ' ' else '8'} | "
@@ -98,26 +109,25 @@ class Board:
 
 class Game:
     """Clase que maneja el flujo de juego, turnos y estado."""
-    
-    
+
     def __init__(self, starter=None):
         """Inicializa el estado del juego."""
         self.board = Board()
-        
+
         if starter:
             self.current_player = starter
         else:
             self.current_player = random.choice(["X", "O"])
-            
+
         self.game_over = False
         self.winner = None
         self.moves_made = 0
-        self.player_mark = 'X' 
-        self.computer_mark = 'O' 
+        self.player_mark = "X"
+        self.computer_mark = "O"
 
     def switch_player(self):
         """Cambia el turno entre X y O."""
-        self.current_player = 'O' if self.current_player == 'X' else 'X'
+        self.current_player = "O" if self.current_player == "X" else "X"
 
     def process_move(self, index):
         """Realiza el movimiento, actualiza el contador, y verifica el estado."""
@@ -138,13 +148,14 @@ class Game:
             return True
         return False
 
+
 def get_player_input(board):
     """Pide y valida la entrada del usuario."""
     while True:
         try:
             position = click.prompt("Elige tu movimiento (1-9)", type=int)
             index = POSITION_MAP.get(position)
-            
+
             if index is None or not board.cells[index] == " ":
                 click.echo("¡Movimiento no válido! Elige un número disponible (1-9).")
             else:
@@ -159,21 +170,19 @@ def get_player_input(board):
 def tictactoe():
     """Ejecuta el juego Tic Tac Toe (Tres en Raya) contra la computadora."""
     click.echo("¡Bienvenido a Tic Tac Toe!")
-    
+
     # 1. Asignar símbolos
     player_mark = click.prompt(
-    "¿Quieres ser 'X' o 'O'?", 
-    type=click.Choice(['X', 'O']), 
-    show_choices=True
-)
+        "¿Quieres ser 'X' o 'O'?", type=click.Choice(["X", "O"]), show_choices=True
+    )
     computer_mark = "O" if player_mark == "X" else "X"
-    
+
     # 2. Inicializar el juego
     # Usamos el constructor con 'starter' opcional
-    game = Game() 
+    game = Game()
     game.player_mark = player_mark
     game.computer_mark = computer_mark
-    
+
     click.echo(f"\n¡Tú eres: {player_mark}! La computadora es: {computer_mark}.")
     click.echo(f"¡El jugador {game.current_player} empieza primero!")
 
@@ -190,13 +199,15 @@ def tictactoe():
         elif game.current_player == computer_mark:
             # Turno de la computadora
             click.echo("Turno de la computadora...")
-            
+
             # Obtener el movimiento de la IA
-            move_index = minimax(game.board.cells, computer_mark, player_mark, computer_mark)
-            
+            move_index = minimax(
+                game.board.cells, computer_mark, player_mark, computer_mark
+            )
+
             if move_index != -1 and game.process_move(move_index):
                 game.switch_player()
-            
+
     # 4. Resultado final
     click.echo(game.board.display())
     if game.winner == "Tie":
