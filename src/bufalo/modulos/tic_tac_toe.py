@@ -1,40 +1,94 @@
-import random, click
-P_MAP = {i+1: i for i in range(9)}
-WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
-def check_win(b, m):
+import random
+from typing import List, Optional
+
+import click
+
+P_MAP = {i + 1: i for i in range(9)}
+WINS = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+]
+
+
+def check_win(b: List[str], m: str) -> bool:
+    """Verifica victoria."""
     for c in WINS:
-        if all(b[i] == m for i in c): return True
+        if all(b[i] == m for i in c):
+            return True
     return False
-def simple_ai(b, m):
+
+
+def simple_ai(b: List[str], m: str) -> int:
+    """IA basica."""
     for i in range(9):
         if b[i] == " ":
-            cp = list(b); cp[i] = m
-            if check_win(cp, m): return i
+            cp = list(b)
+            cp[i] = m
+            if check_win(cp, m):
+                return i
     mv = [i for i, v in enumerate(b) if v == " "]
     return random.choice(mv) if mv else -1
+
+
 class Board:
-    def __init__(self): self.cells = [" "] * 9
-    def display(self):
-        c = [self.cells[i] if self.cells[i] != " " else str(i+1) for i in range(9)]
+    def __init__(self) -> None:
+        self.cells: List[str] = [" "] * 9
+
+    def display(self) -> str:
+        c = [self.cells[i] if self.cells[i] != " " else str(i + 1) for i in range(9)]
         return f"|{c[0]}|{c[1]}|{c[2]}|\n|{c[3]}|{c[4]}|{c[5]}|\n|{c[6]}|{c[7]}|{c[8]}|"
+
+
 class Game:
-    def __init__(self, s="X"): self.board, self.curr, self.over, self.res = Board(), s, False, None
-    def process(self, i):
-        if self.over or i < 0 or self.board.cells[i] != " ": return False
+    def __init__(self, s: str = "X") -> None:
+        self.board = Board()
+        self.curr = s
+        self.over = False
+        self.res: Optional[str] = None
+
+    def process(self, i: int) -> bool:
+        if self.over or i < 0 or i >= 9 or self.board.cells[i] != " ":
+            return False
         self.board.cells[i] = self.curr
-        if check_win(self.board.cells, self.curr): self.over, self.res = True, self.curr
-        elif " " not in self.board.cells: self.over, self.res = True, "Tie"
+        if check_win(self.board.cells, self.curr):
+            self.over, self.res = True, self.curr
+        elif " " not in self.board.cells:
+            self.over, self.res = True, "Tie"
         return True
+
+
 @click.group(invoke_without_command=True)
-def tictactoe(): pass
+def tictactoe() -> None:
+    """Tic Tac Toe."""
+    pass
+
+
 @tictactoe.command()
-def jugar():
+def jugar() -> None:
+    """Jugar."""
     try:
-        pm = click.prompt("X/O", type=click.Choice(["X", "O"])); cm = "O" if pm == "X" else "X"; g = Game("X")
+        pm = click.prompt("X/O", type=click.Choice(["X", "O"]))
+        cm = "O" if pm == "X" else "X"
+        g = Game("X")
         while not g.over:
-            idx = click.prompt("Pos", type=int) - 1 if g.curr == pm else simple_ai(g.board.cells, cm)
-            if g.process(idx): 
-                if not g.over: g.curr = "O" if g.curr == "X" else "X"
-            else: click.echo("Err")
+            if g.curr == pm:
+                p = click.prompt("Pos", type=int)
+                idx = P_MAP.get(p, -1)
+            else:
+                idx = simple_ai(g.board.cells, cm)
+            if g.process(idx):
+                if not g.over:
+                    g.curr = "O" if g.curr == "X" else "X"
+            else:
+                click.echo("Error")
         click.echo(f"Fin:{g.res}")
-    except Exception as e: click.echo(f"Out:{type(e).__name__}")
+    except click.exceptions.Abort:
+        click.echo("Bye")
+    except Exception as e:
+        click.echo(f"Out:{type(e).__name__}")
